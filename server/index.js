@@ -1,10 +1,16 @@
 
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const distPath = path.join(__dirname, "../dist");
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -177,6 +183,13 @@ app.post("/api/study", async (req, res) => {
         : error.message || "Something went wrong."
     });
   }
+});
+// Serve React production build
+app.use(express.static(distPath));
+
+// Handle frontend routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 app.listen(PORT, () => {
